@@ -1,0 +1,38 @@
+{
+  "name": "sprint-2-api-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write .",
+    "lint": "eslint src/**/*.js",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lynxBios/sprint-2-api-client.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/lynxBios/sprint-2-api-client/issues"
+  },
+  "homepage": "https://github.com/lynxBios/sprint-2-api-client#readme",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1",
+    "prettier": "^3.9.7"
+  },
+  "lint-staged": {
+    "*.js": [
+      "npx prettier --write",
+      "npx eslint --fix"
+    ]
+  }
+}
