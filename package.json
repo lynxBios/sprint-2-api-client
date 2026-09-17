@@ -34,5 +34,8 @@
       "npx prettier --write",
       "npx eslint --fix"
     ]
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
   }
 }
