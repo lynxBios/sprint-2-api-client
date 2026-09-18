@@ -51,4 +51,12 @@ export class ReqResClient {
 
     return await this._request(endpoint, options);
   }
+
+  testContext() {
+    setTimeout(() => {
+      // An arrow function does not have its own this; it uses this from the surrounding testContext() context.
+      // eslint-disable-next-line no-console
+      console.log(this.baseUrl);
+    }, 1000);
+  }
 }
