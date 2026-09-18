@@ -26,4 +26,29 @@ export class ReqResClient {
 
     return response.json();
   }
+
+  async getUser(id) {
+    const endpoint = `/api/users/${id}`;
+    const options = {
+      headers: {
+        'x-api-key': this.apiKey,
+      },
+    };
+
+    return await this._request(endpoint, options);
+  }
+
+  async createUser(userData) {
+    const endpoint = `/api/users/`;
+    const options = {
+      method: 'POST',
+      headers: {
+        'x-api-key': this.apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    };
+
+    return await this._request(endpoint, options);
+  }
 }
