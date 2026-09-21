@@ -4,10 +4,18 @@
  * @param {number[]} allowedStatuses
  * @returns {Function} Returns a wrapped async function.
  */
-
 export function withValidation(fetchFn, allowedStatuses) {
+  if (typeof fetchFn !== 'function') {
+    throw new TypeError('fetchFn must be a function');
+  }
+
+  if (!Array.isArray(allowedStatuses)) {
+    throw new TypeError('allowedStatuses must be an array');
+  }
+
   return async function (...args) {
     let fetchFnResponse;
+
     try {
       fetchFnResponse = await fetchFn(...args);
     } catch (error) {
@@ -19,6 +27,6 @@ export function withValidation(fetchFn, allowedStatuses) {
       throw new Error(`HTTP ${fetchFnResponse.status}: ${errorBody}`);
     }
 
-    return await fetchFnResponse.json();
+    return fetchFnResponse.json();
   };
 }
