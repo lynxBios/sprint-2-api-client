@@ -1,10 +1,14 @@
 import 'dotenv/config';
 
+const CONTEXT_TEST_DELAY_MS = 1000;
+
 /**
  * API client for interacting with the ReqRes API.
  */
-
 export class ReqResClient {
+  /**
+   * Creates a new ReqRes API client.
+   */
   constructor() {
     if (!process.env.API_BASE_URL) {
       throw new Error('API_BASE_URL must be set');
@@ -14,8 +18,14 @@ export class ReqResClient {
     this.apiKey = process.env.REQRES_API_KEY;
   }
 
+  /**
+   * Sends an HTTP request to the ReqRes API.
+   * @param {string} endpoint - API endpoint.
+   * @param {object} options - Fetch request options.
+   * @returns {Promise<object>} Parsed JSON response.
+   */
   async _request(endpoint, options) {
-    const url = this.baseUrl.concat(endpoint);
+    const url = new URL(endpoint, this.baseUrl);
     const response = await fetch(url, options);
 
     if (!response.ok) {
@@ -27,7 +37,16 @@ export class ReqResClient {
     return response.json();
   }
 
+  /**
+   * Retrieves a user by ID.
+   * @param {number} id - User ID.
+   * @returns {Promise<object>} User data.
+   */
   async getUser(id) {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error('User ID must be a positive integer');
+    }
+
     const endpoint = `/api/users/${id}`;
     const options = {
       headers: {
@@ -35,10 +54,19 @@ export class ReqResClient {
       },
     };
 
-    return await this._request(endpoint, options);
+    return this._request(endpoint, options);
   }
 
+  /**
+   * Creates a new user.
+   * @param {object} userData - User data to create.
+   * @returns {Promise<object>} Created user data.
+   */
   async createUser(userData) {
+    if (!userData || typeof userData !== 'object') {
+      throw new Error('User data must be a non-null object');
+    }
+
     const endpoint = `/api/users/`;
     const options = {
       method: 'POST',
@@ -49,14 +77,18 @@ export class ReqResClient {
       body: JSON.stringify(userData),
     };
 
-    return await this._request(endpoint, options);
+    return this._request(endpoint, options);
   }
 
+  /**
+   * Demonstrates lexical this binding with an arrow function.
+   * @returns {void}
+   */
   testContext() {
     setTimeout(() => {
       // An arrow function does not have its own this; it uses this from the surrounding testContext() context.
       // eslint-disable-next-line no-console
       console.log(this.baseUrl);
-    }, 1000);
+    }, CONTEXT_TEST_DELAY_MS);
   }
 }

@@ -3,6 +3,7 @@ import { ReqResClient } from './ReqResClient.js';
 import assert from 'node:assert';
 
 const USER_IDS = [1, 2, 3];
+const EXPECTED_USERS_COUNT = USER_IDS.length;
 
 const client = new ReqResClient();
 
@@ -17,4 +18,4 @@ const usersEmail = requestedUsersList.map((user) => {
 });
 
 assert.ok(Array.isArray(usersEmail));
-assert.strictEqual(usersEmail.length, 3);
+assert.strictEqual(usersEmail.length, EXPECTED_USERS_COUNT);
