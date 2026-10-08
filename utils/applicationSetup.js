@@ -1,3 +1,6 @@
+/**
+ * Dismisses application welcome and cookie banners.
+ */
 export async function applicationSetup(page) {
   await page
     .getByRole('button', {

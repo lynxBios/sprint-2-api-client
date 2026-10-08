@@ -1,3 +1,6 @@
+/**
+ * Page Object for the login page.
+ */
 export class LoginPage {
   constructor(page) {
     this.page = page;
@@ -11,9 +14,21 @@ export class LoginPage {
     });
   }
 
-  async login(email, password) {
+  async fillLoginForm(email, password) {
     await this.userEmailInput.fill(email);
     await this.passwordInput.fill(password);
+  }
+
+  async clickLogin() {
     await this.loginButton.click();
+  }
+
+  async login(email, password) {
+    await this.fillLoginForm(email, password);
+    await this.clickLogin();
+  }
+
+  async isLoginButtonDisabled() {
+    return this.loginButton.isDisabled();
   }
 }

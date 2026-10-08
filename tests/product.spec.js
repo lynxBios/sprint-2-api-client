@@ -1,22 +1,30 @@
 import { test, expect } from '@playwright/test';
 import { TEST_USER } from '../config/testData.js';
+import { LoginPage } from '../pages/LoginPage.js';
+import { ProductsPage } from '../pages/ProductsPage.js';
+import { BasketPage } from '../pages/BasketPage.js';
+import { applicationSetup } from '../utils/applicationSetup.js';
+
+const APPLE_JUICE = 'Apple Juice';
+const APPLE_JUICE_IN_BASKET = 'Apple Juice (1000ml)';
+const APPLE_JUICE_PRICE = '1.99¤';
+
+test.beforeEach(async ({ page }) => {
+  await page.goto('/#/login');
+  await applicationSetup(page);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.login(TEST_USER.email, TEST_USER.password);
+});
 
 test('user can add Apple Juice to basket', async ({ page }) => {
-  await page.goto('/#/login');
-  await page.getByRole('button', { name: 'Close Welcome Banner' }).click();
-  await page.getByLabel('Email').fill(TEST_USER.email);
-  await page
-    .getByRole('textbox', { name: 'Text field for the login password' })
-    .fill(TEST_USER.password);
-  await page.getByRole('button', { name: 'Login', exact: true }).click();
-
-  const product = page.locator('mat-card').filter({ hasText: 'Apple Juice' });
+  const productsPage = new ProductsPage(page);
 
   const basketCountBefore = await page
     .locator('.fa-layers-counter')
     .innerText();
 
-  await product.getByRole('button', { name: 'Add to Basket' }).click();
+  await productsPage.addProductToBasket(APPLE_JUICE);
 
   await expect(page.locator('.fa-layers-counter')).not.toHaveText(
     basketCountBefore,
@@ -24,31 +32,17 @@ test('user can add Apple Juice to basket', async ({ page }) => {
 });
 
 test('Apple Juice displays correct information', async ({ page }) => {
-  await page.goto('/#/login');
-  await page.getByRole('button', { name: 'Close Welcome Banner' }).click();
-  await page.getByLabel('Email').fill(TEST_USER.email);
-  await page
-    .getByRole('textbox', { name: 'Text field for the login password' })
-    .fill(TEST_USER.password);
-  await page.getByRole('button', { name: 'Login', exact: true }).click();
+  const productsPage = new ProductsPage(page);
+  const product = productsPage.findProduct(APPLE_JUICE);
 
-  const product = page.locator('mat-card').filter({ hasText: 'Apple Juice' });
-
-  await expect(product).toContainText('Apple Juice (1000ml)');
-
-  await expect(product).toContainText('1.99¤');
+  await expect(product).toContainText(APPLE_JUICE_IN_BASKET);
+  await expect(product).toContainText(APPLE_JUICE_PRICE);
 });
 
 test('user can open basket', async ({ page }) => {
-  await page.goto('/#/login');
-  await page.getByRole('button', { name: 'Close Welcome Banner' }).click();
-  await page.getByLabel('Email').fill(TEST_USER.email);
-  await page
-    .getByRole('textbox', { name: 'Text field for the login password' })
-    .fill(TEST_USER.password);
-  await page.getByRole('button', { name: 'Login', exact: true }).click();
+  const basketPage = new BasketPage(page);
 
-  await page.getByText('Your Basket', { exact: true }).click();
+  await basketPage.open();
 
   await expect(
     page.getByText(`Your Basket (${TEST_USER.email})`),
@@ -56,56 +50,27 @@ test('user can open basket', async ({ page }) => {
 });
 
 test('added product is displayed in basket', async ({ page }) => {
-  await page.goto('/#/login');
-  await page.getByRole('button', { name: 'Close Welcome Banner' }).click();
-  await page.getByLabel('Email').fill(TEST_USER.email);
-  await page
-    .getByRole('textbox', { name: 'Text field for the login password' })
-    .fill(TEST_USER.password);
-  await page.getByRole('button', { name: 'Login', exact: true }).click();
+  const productsPage = new ProductsPage(page);
+  const basketPage = new BasketPage(page);
 
-  const product = page.locator('mat-card').filter({ hasText: 'Apple Juice' });
+  await productsPage.addProductToBasket(APPLE_JUICE);
+  await basketPage.open();
 
-  await product.getByRole('button', { name: 'Add to Basket' }).click();
-
-  await page.getByText('Your Basket', { exact: true }).click();
-
-  await expect(
-    page.getByText('Apple Juice (1000ml)', { exact: true }),
-  ).toBeVisible();
+  await expect(basketPage.getProductRow(APPLE_JUICE_IN_BASKET)).toBeVisible();
 });
 
 test('user can remove product from basket', async ({ page }) => {
-  await page.goto('/#/login');
-  await page.getByRole('button', { name: 'Close Welcome Banner' }).click();
+  const productsPage = new ProductsPage(page);
+  const basketPage = new BasketPage(page);
 
-  await page.getByLabel('Email').fill(TEST_USER.email);
-  await page
-    .getByRole('textbox', { name: 'Text field for the login password' })
-    .fill(TEST_USER.password);
-  await page.getByRole('button', { name: 'Login', exact: true }).click();
+  await productsPage.addProductToBasket(APPLE_JUICE);
+  await basketPage.open();
 
-  const product = page.locator('mat-card').filter({ hasText: 'Apple Juice' });
+  await expect(basketPage.getProductRow(APPLE_JUICE_IN_BASKET)).toBeVisible();
 
-  await product.getByRole('button', { name: 'Add to Basket' }).click();
+  await basketPage.removeProduct(APPLE_JUICE_IN_BASKET);
 
   await expect(
-    page.getByText('Apple Juice (1000ml)', { exact: true }),
-  ).toBeVisible();
-
-  await page.getByText('Your Basket', { exact: true }).click();
-
-  await expect(
-    page.getByText('Apple Juice (1000ml)', { exact: true }),
-  ).toBeVisible();
-
-  const productRow = page
-    .getByText('Apple Juice (1000ml)', { exact: true })
-    .locator('..');
-
-  await productRow.locator('mat-cell.mat-column-remove button').click();
-
-  await expect(
-    page.getByText('Apple Juice (1000ml)', { exact: true }),
+    basketPage.getProductRow(APPLE_JUICE_IN_BASKET),
   ).not.toBeVisible();
 });

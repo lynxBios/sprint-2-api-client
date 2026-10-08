@@ -1,3 +1,6 @@
+/**
+ * Page Object for the basket page.
+ */
 export class BasketPage {
   constructor(page) {
     this.page = page;

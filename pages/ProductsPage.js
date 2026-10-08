@@ -1,3 +1,6 @@
+/**
+ * Page Object for the products page.
+ */
 export class ProductsPage {
   constructor(page) {
     this.page = page;
